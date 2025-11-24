@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RC Generator – Government Layout</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f1f1f1;
+        padding: 20px;
+    }
+
+    .box {
+        max-width: 650px;
+        margin: auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px #ccc;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 8px;
+        margin-bottom: 15px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 18px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="box">
+    <h2 style="text-align:center;">Government RC Generator (With Background)</h2>
+
+    <input id="regn" placeholder="Registration Number">
+    <input id="owner" placeholder="Owner Name">
+    <input id="father" placeholder="S/W/D Of">
+    <input id="purpose" placeholder="Purpose">
+    <input id="regndate" placeholder="Registration Date (e.g., 07-Nov-2025)">
+    <input id="color" placeholder="Colour">
+    <input id="fuel" placeholder="Fuel Type">
+    <input id="vehicle" placeholder="Vehicle Class">
+    <input id="body" placeholder="Body Type">
+    <input id="manufacturer" placeholder="Manufacturer">
+    <input id="chassis" placeholder="Chassis Number">
+    <input id="engine" placeholder="Engine Number">
+    <input id="model" placeholder="Model Number">
+    <input id="hypo" placeholder="Hypothecated To">
+    <input id="seat" placeholder="Seating Capacity">
+    <input id="stand" placeholder="Standing Capacity">
+    <input id="rlw" placeholder="RLW">
+    <input id="unladen" placeholder="Unladen Weight">
+    <input id="cubic" placeholder="Cubic Capacity">
+    <input id="wheel" placeholder="Wheel Base">
+    <textarea id="address" placeholder="Address"></textarea>
+    <input id="authority" placeholder="Issuing Authority">
+
+    <button onclick="generateRC()">Generate RC PDF</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+async function generateRC() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+        unit: "pt",
+        format: [1012, 638]   // RC card aspect ratio
+    });
+
+    // Load background image
+    const bg = await loadImage("background.jpg");
+    pdf.addImage(bg, "JPEG", 0, 0, 1012, 638);
+
+    pdf.setFont("helvetica", "bold");
+
+    // ---- POSITION TEXT EXACTLY BASED ON IMAGE ----
+    pdf.text(document.getElementById("regn").value, 760, 80);
+    pdf.text(document.getElementById("owner").value, 760, 110);
+    pdf.text(document.getElementById("father").value, 760, 140);
+    pdf.text(document.getElementById("purpose").value, 760, 170);
+    pdf.text(document.getElementById("regndate").value, 450, 210);
+    pdf.text(document.getElementById("color").value, 450, 240);
+    pdf.text(document.getElementById("fuel").value, 450, 270);
+    pdf.text(document.getElementById("vehicle").value, 450, 300);
+    pdf.text(document.getElementById("body").value, 450, 330);
+    pdf.text(document.getElementById("manufacturer").value, 450, 360);
+    pdf.text(document.getElementById("chassis").value, 450, 390);
+    pdf.text(document.getElementById("engine").value, 450, 420);
+    pdf.text(document.getElementById("model").value, 450, 450);
+    pdf.text(document.getElementById("hypo").value, 450, 490);
+    pdf.text(document.getElementById("seat").value, 450, 520);
+    pdf.text(document.getElementById("stand").value, 630, 520);
+    pdf.text(document.getElementById("rlw").value, 450, 560);
+    pdf.text(document.getElementById("unladen").value, 630, 560);
+    pdf.text(document.getElementById("cubic").value, 760, 560);
+    pdf.text(document.getElementById("wheel").value, 840, 560);
+
+    pdf.text(document.getElementById("address").value, 200, 520);
+    pdf.text(document.getElementById("authority").value, 200, 590);
+
+    // ---------- QR DATA (GOVERNMENT STYLE) ----------
+    const qrString =
+        document.getElementById("regn").value + "|" +
+        document.getElementById("chassis").value + "|" +
+        document.getElementById("engine").value + "|" +
+        document.getElementById("fuel").value + "|" +
+        document.getElementById("owner").value + "|" +
+        document.getElementById("manufacturer").value;
+
+    const qrDataUrl = await generateQR(qrString);
+    pdf.addImage(qrDataUrl, "PNG", 40, 240, 270, 270);
+
+    pdf.save("RC-GOV.pdf");
+}
+
+// QR helper
+function generateQR(text) {
+    return new Promise((resolve) => {
+        const temp = document.createElement("div");
+        temp.style.position = "fixed";
+        temp.style.left = "-9999px";
+        document.body.appendChild(temp);
+
+        const q = new QRCode(temp, {
+            text: text,
+            width: 300,
+            height: 300,
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        setTimeout(() => {
+            const img = temp.querySelector("img").src;
+            document.body.removeChild(temp);
+            resolve(img);
+        }, 400);
+    });
+}
+
+// Load background image
+function loadImage(url) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.src = url;
+    });
+}
+</script>
+
+</body>
+</html>
