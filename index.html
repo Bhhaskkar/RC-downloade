@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RC Generator – Clean Govt Layout</title>
+<title>RC Generator – Clean Govt Layout (No QR, No Background)</title>
 
 <style>
     body {
         font-family: Arial, sans-serif;
-        background: #f1f1f1;
+        background: #f2f2f2;
         padding: 20px;
     }
 
@@ -34,7 +34,7 @@
     button {
         width: 100%;
         padding: 12px;
-        background: #007bff;
+        background: #28a745;
         color: white;
         border: none;
         border-radius: 6px;
@@ -48,7 +48,7 @@
 <body>
 
 <div class="box">
-    <h2 style="text-align:center;">Government RC Generator (No Background)</h2>
+    <h2 style="text-align:center;">Government RC Generator<br>(Plain Layout – No QR, No Background)</h2>
 
     <input id="regn" placeholder="Registration Number">
     <input id="owner" placeholder="Owner Name">
@@ -76,84 +76,51 @@
     <button onclick="generateRC()">Generate RC PDF</button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-async function generateRC() {
+// Generate PDF without QR
+function generateRC() {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
         unit: "pt",
-        format: [1012, 638]  // clean card size
+        format: [1012, 638]  // clean RC card size
     });
 
     pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
 
-    // ---- POSITION TEXT EXACTLY ----
+    // Left side details
     pdf.text(`Regn. Number: ${regn.value}`, 40, 60);
     pdf.text(`Regd. Owner: ${owner.value}`, 40, 90);
     pdf.text(`S/W/D Of: ${father.value}`, 40, 120);
     pdf.text(`Purpose: ${purpose.value}`, 40, 150);
-
     pdf.text(`Regn. Date: ${regndate.value}`, 40, 190);
     pdf.text(`Colour: ${color.value}`, 40, 220);
     pdf.text(`Fuel: ${fuel.value}`, 40, 250);
     pdf.text(`Vehicle Class: ${vehicle.value}`, 40, 280);
     pdf.text(`Body Type: ${body.value}`, 40, 310);
     pdf.text(`Manufacturer: ${manufacturer.value}`, 40, 340);
-
     pdf.text(`Chassis No: ${chassis.value}`, 40, 370);
     pdf.text(`Engine No: ${engine.value}`, 40, 400);
     pdf.text(`Model No: ${model.value}`, 40, 430);
 
-    pdf.text(`Hypothecated To: ${hypo.value}`, 40, 470);
-    pdf.text(`Seat Capacity: ${seat.value}`, 40, 500);
-    pdf.text(`Stand Capacity: ${stand.value}`, 40, 530);
+    // Right side fields
+    pdf.text(`Hypothecated To: ${hypo.value}`, 350, 60);
+    pdf.text(`Seat Capacity: ${seat.value}`, 350, 100);
+    pdf.text(`Stand Capacity: ${stand.value}`, 350, 130);
+    pdf.text(`RLW: ${rlw.value}`, 350, 170);
+    pdf.text(`Unladen Wt: ${unladen.value}`, 350, 200);
+    pdf.text(`Cubic Capacity: ${cubic.value}`, 350, 230);
+    pdf.text(`Wheel Base: ${wheel.value}`, 350, 260);
 
-    pdf.text(`RLW: ${rlw.value}`, 300, 500);
-    pdf.text(`Unladen Wt: ${unladen.value}`, 300, 530);
-    pdf.text(`Cubic Capacity: ${cubic.value}`, 300, 560);
-    pdf.text(`Wheel Base: ${wheel.value}`, 300, 590);
+    // Address
+    pdf.text(`Address: ${address.value}`, 40, 520);
 
-    pdf.text(`Address: ${address.value}`, 40, 590);
-    pdf.text(`Issuing Authority: ${authority.value}`, 40, 620);
+    // Issuing Authority
+    pdf.text(`Issuing Authority: ${authority.value}`, 40, 560);
 
-    // ---------- QR DATA (GOVERNMENT STYLE) ----------
-    const qrString =
-        regn.value + "|" +
-        chassis.value + "|" +
-        engine.value + "|" +
-        fuel.value + "|" +
-        owner.value + "|" +
-        manufacturer.value;
-
-    const qrDataUrl = await generateQR(qrString);
-    pdf.addImage(qrDataUrl, "PNG", 700, 200, 250, 250);
-
-    pdf.save("RC-NoBackground.pdf");
-}
-
-// QR generator
-function generateQR(text) {
-    return new Promise((resolve) => {
-        const temp = document.createElement("div");
-        temp.style.position = "fixed";
-        temp.style.left = "-9999px";
-        document.body.appendChild(temp);
-
-        new QRCode(temp, {
-            text: text,
-            width: 300,
-            height: 300,
-            correctLevel: QRCode.CorrectLevel.H
-        });
-
-        setTimeout(() => {
-            const img = temp.querySelector("img").src;
-            document.body.removeChild(temp);
-            resolve(img);
-        }, 400);
-    });
+    pdf.save("RC-NoQR-NoBG.pdf");
 }
 </script>
 
