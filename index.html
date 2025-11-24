@@ -2,127 +2,241 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RC Generator – Clean Govt Layout (No QR, No Background)</title>
+<title>RC Downloader - PVC Card Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- QR Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
     body {
         font-family: Arial, sans-serif;
-        background: #f2f2f2;
+        background: #f4f4f4;
+        margin: 0;
         padding: 20px;
     }
 
-    .box {
-        max-width: 650px;
-        margin: auto;
-        background: #fff;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 0 10px #ccc;
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 26px;
     }
 
-    input, textarea {
+    .container {
+        max-width: 1000px;
+        margin: auto;
+        display: flex;
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+
+    .form-box {
+        flex: 1 1 350px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 6px rgba(0,0,0,0.15);
+    }
+
+    .form-box label {
+        font-size: 14px;
+        font-weight: bold;
+        display: block;
+        margin-top: 10px;
+    }
+
+    .form-box input, textarea {
         width: 100%;
-        padding: 10px;
-        margin-top: 8px;
-        margin-bottom: 15px;
-        border-radius: 6px;
+        padding: 8px;
+        margin-top: 4px;
         border: 1px solid #ccc;
+        border-radius: 4px;
         font-size: 14px;
     }
 
-    button {
-        width: 100%;
-        padding: 12px;
-        background: #28a745;
-        color: white;
+    textarea { resize: vertical; }
+
+    .btn {
+        margin-top: 15px;
+        padding: 10px 18px;
         border: none;
-        border-radius: 6px;
-        font-size: 18px;
+        font-size: 15px;
         cursor: pointer;
-        margin-top: 10px;
+        border-radius: 6px;
+        background: #000;
+        color: white;
+        font-weight: bold;
+    }
+
+    /* PVC CARD (Exact 85.6 × 54 mm scaled in pixels) */
+    .card {
+        width: 856px;   /* ×10 scale for high clarity */
+        height: 540px;
+        background: #fff;
+        border: 2px solid #000;
+        border-radius: 10px;
+        padding: 25px;
+        position: relative;
+        font-size: 22px;
+        overflow: hidden;
+    }
+
+    .line { margin-bottom: 8px; }
+
+    #qrPreview {
+        position: absolute;
+        right: 25px;
+        bottom: 25px;
+        width: 220px;
+        height: 220px;
+        border: 1px solid #000;
     }
 </style>
-
 </head>
 <body>
 
-<div class="box">
-    <h2 style="text-align:center;">Government RC Generator<br>(Plain Layout – No QR, No Background)</h2>
+<h1>RC Downloader – PVC Card Generator</h1>
 
-    <input id="regn" placeholder="Registration Number">
-    <input id="owner" placeholder="Owner Name">
-    <input id="father" placeholder="S/W/D Of">
-    <input id="purpose" placeholder="Purpose">
-    <input id="regndate" placeholder="Registration Date (e.g., 07-Nov-2025)">
-    <input id="color" placeholder="Colour">
-    <input id="fuel" placeholder="Fuel Type">
-    <input id="vehicle" placeholder="Vehicle Class">
-    <input id="body" placeholder="Body Type">
-    <input id="manufacturer" placeholder="Manufacturer">
-    <input id="chassis" placeholder="Chassis Number">
-    <input id="engine" placeholder="Engine Number">
-    <input id="model" placeholder="Model Number">
-    <input id="hypo" placeholder="Hypothecated To">
-    <input id="seat" placeholder="Seating Capacity">
-    <input id="stand" placeholder="Standing Capacity">
-    <input id="rlw" placeholder="RLW">
-    <input id="unladen" placeholder="Unladen Weight">
-    <input id="cubic" placeholder="Cubic Capacity">
-    <input id="wheel" placeholder="Wheel Base">
-    <textarea id="address" placeholder="Address"></textarea>
-    <input id="authority" placeholder="Issuing Authority">
+<div class="container">
 
-    <button onclick="generateRC()">Generate RC PDF</button>
+    <!-- FORM -->
+    <div class="form-box">
+        <h3>Enter Vehicle Details</h3>
+
+        <label>Registration Number</label><input id="regn">
+
+        <label>Owner Name</label><input id="owner">
+
+        <label>Father/S/D/W</label><input id="swd">
+
+        <label>Purpose</label><input id="purpose">
+
+        <label>Registration Date</label><input id="regndate">
+
+        <label>Colour</label><input id="colour">
+
+        <label>Fuel</label><input id="fuel">
+
+        <label>Vehicle Class</label><input id="vehclass">
+
+        <label>Body Type</label><input id="bodytype">
+
+        <label>Manufacturer</label><input id="manuf">
+
+        <label>Chassis No</label><input id="chassis">
+
+        <label>Engine No</label><input id="engine">
+
+        <label>Model No</label><input id="model">
+
+        <label>Hypothecated To</label><input id="hypo">
+
+        <label>Seat Capacity</label><input id="seat">
+
+        <label>Stand Capacity</label><input id="stand">
+
+        <label>No. Of Cyl</label><input id="cyc">
+
+        <label>Unladen Weight</label><input id="unladen">
+
+        <label>Cubic Capacity</label><input id="cubic">
+
+        <label>Wheel Base</label><input id="wheel">
+
+        <label>Owner Serial</label><input id="serial">
+
+        <label>Tax Paid Upto</label><input id="tax">
+
+        <label>Address</label><textarea id="addr" rows="2"></textarea>
+
+        <label>Issuing Authority</label><input id="auth">
+
+        <label>Validity</label><input id="valid">
+
+        <button class="btn" onclick="updateCard()">Update Preview</button>
+        <button class="btn" onclick="downloadPDF()">Download PVC PDF</button>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="card" id="card">
+        <div id="textArea"></div>
+        <div id="qrPreview"></div>
+    </div>
+
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <script>
-// Generate PDF without QR
-function generateRC() {
+
+// FUNCTION — UPDATE PREVIEW
+function updateCard() {
+    const fields = {
+        regn: regn.value,
+        owner: owner.value,
+        swd: swd.value,
+        purpose: purpose.value,
+        regndate: regndate.value,
+        colour: colour.value,
+        fuel: fuel.value,
+        vehclass: vehclass.value,
+        bodytype: bodytype.value,
+        manuf: manuf.value,
+        chassis: chassis.value,
+        engine: engine.value,
+        model: model.value,
+        hypo: hypo.value,
+        seat: seat.value,
+        stand: stand.value,
+        cyc: cyc.value,
+        unladen: unladen.value,
+        cubic: cubic.value,
+        wheel: wheel.value,
+        serial: serial.value,
+        tax: tax.value,
+        addr: addr.value,
+        auth: auth.value,
+        valid: valid.value
+    };
+
+    // Create text block
+    let html = "";
+    for (const key in fields) {
+        html += `<div class='line'><b>${key.toUpperCase()}:</b> ${fields[key]}</div>`;
+    }
+    textArea.innerHTML = html;
+
+    // Generate QR
+    qrPreview.innerHTML = "";
+    new QRCode(qrPreview, {
+        text: JSON.stringify(fields),
+        width: 220,
+        height: 220
+    });
+}
+
+// FUNCTION — DOWNLOAD PVC PDF
+async function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
-        unit: "pt",
-        format: [1012, 638]  // clean RC card size
+        unit: "mm",
+        format: [85.6, 54]   // Exact PVC dimensions
     });
 
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(14);
-
-    // Left side details
-    pdf.text(`Regn. Number: ${regn.value}`, 40, 60);
-    pdf.text(`Regd. Owner: ${owner.value}`, 40, 90);
-    pdf.text(`S/W/D Of: ${father.value}`, 40, 120);
-    pdf.text(`Purpose: ${purpose.value}`, 40, 150);
-    pdf.text(`Regn. Date: ${regndate.value}`, 40, 190);
-    pdf.text(`Colour: ${color.value}`, 40, 220);
-    pdf.text(`Fuel: ${fuel.value}`, 40, 250);
-    pdf.text(`Vehicle Class: ${vehicle.value}`, 40, 280);
-    pdf.text(`Body Type: ${body.value}`, 40, 310);
-    pdf.text(`Manufacturer: ${manufacturer.value}`, 40, 340);
-    pdf.text(`Chassis No: ${chassis.value}`, 40, 370);
-    pdf.text(`Engine No: ${engine.value}`, 40, 400);
-    pdf.text(`Model No: ${model.value}`, 40, 430);
-
-    // Right side fields
-    pdf.text(`Hypothecated To: ${hypo.value}`, 350, 60);
-    pdf.text(`Seat Capacity: ${seat.value}`, 350, 100);
-    pdf.text(`Stand Capacity: ${stand.value}`, 350, 130);
-    pdf.text(`RLW: ${rlw.value}`, 350, 170);
-    pdf.text(`Unladen Wt: ${unladen.value}`, 350, 200);
-    pdf.text(`Cubic Capacity: ${cubic.value}`, 350, 230);
-    pdf.text(`Wheel Base: ${wheel.value}`, 350, 260);
-
-    // Address
-    pdf.text(`Address: ${address.value}`, 40, 520);
-
-    // Issuing Authority
-    pdf.text(`Issuing Authority: ${authority.value}`, 40, 560);
-
-    pdf.save("RC-NoQR-NoBG.pdf");
+    // Convert card to image
+    const card = document.getElementById("card");
+    html2canvas(card).then(canvas => {
+        const img = canvas.toDataURL("image/png");
+        pdf.addImage(img, "PNG", 0, 0, 85.6, 54);
+        pdf.save("RC_PVC_Card.pdf");
+    });
 }
+
 </script>
+
+<!-- html2canvas for screenshot -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 </body>
 </html>
