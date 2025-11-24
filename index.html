@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RC Generator – Government Layout</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RC Generator – Clean Govt Layout</title>
 
 <style>
     body {
@@ -48,7 +48,7 @@
 <body>
 
 <div class="box">
-    <h2 style="text-align:center;">Government RC Generator (With Background)</h2>
+    <h2 style="text-align:center;">Government RC Generator (No Background)</h2>
 
     <input id="regn" placeholder="Registration Number">
     <input id="owner" placeholder="Owner Name">
@@ -84,56 +84,56 @@ async function generateRC() {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
         unit: "pt",
-        format: [1012, 638]   // RC card aspect ratio
+        format: [1012, 638]  // clean card size
     });
-
-    // Load background image
-    const bg = await loadImage("background.jpg");
-    pdf.addImage(bg, "JPEG", 0, 0, 1012, 638);
 
     pdf.setFont("helvetica", "bold");
 
-    // ---- POSITION TEXT EXACTLY BASED ON IMAGE ----
-    pdf.text(document.getElementById("regn").value, 760, 80);
-    pdf.text(document.getElementById("owner").value, 760, 110);
-    pdf.text(document.getElementById("father").value, 760, 140);
-    pdf.text(document.getElementById("purpose").value, 760, 170);
-    pdf.text(document.getElementById("regndate").value, 450, 210);
-    pdf.text(document.getElementById("color").value, 450, 240);
-    pdf.text(document.getElementById("fuel").value, 450, 270);
-    pdf.text(document.getElementById("vehicle").value, 450, 300);
-    pdf.text(document.getElementById("body").value, 450, 330);
-    pdf.text(document.getElementById("manufacturer").value, 450, 360);
-    pdf.text(document.getElementById("chassis").value, 450, 390);
-    pdf.text(document.getElementById("engine").value, 450, 420);
-    pdf.text(document.getElementById("model").value, 450, 450);
-    pdf.text(document.getElementById("hypo").value, 450, 490);
-    pdf.text(document.getElementById("seat").value, 450, 520);
-    pdf.text(document.getElementById("stand").value, 630, 520);
-    pdf.text(document.getElementById("rlw").value, 450, 560);
-    pdf.text(document.getElementById("unladen").value, 630, 560);
-    pdf.text(document.getElementById("cubic").value, 760, 560);
-    pdf.text(document.getElementById("wheel").value, 840, 560);
+    // ---- POSITION TEXT EXACTLY ----
+    pdf.text(`Regn. Number: ${regn.value}`, 40, 60);
+    pdf.text(`Regd. Owner: ${owner.value}`, 40, 90);
+    pdf.text(`S/W/D Of: ${father.value}`, 40, 120);
+    pdf.text(`Purpose: ${purpose.value}`, 40, 150);
 
-    pdf.text(document.getElementById("address").value, 200, 520);
-    pdf.text(document.getElementById("authority").value, 200, 590);
+    pdf.text(`Regn. Date: ${regndate.value}`, 40, 190);
+    pdf.text(`Colour: ${color.value}`, 40, 220);
+    pdf.text(`Fuel: ${fuel.value}`, 40, 250);
+    pdf.text(`Vehicle Class: ${vehicle.value}`, 40, 280);
+    pdf.text(`Body Type: ${body.value}`, 40, 310);
+    pdf.text(`Manufacturer: ${manufacturer.value}`, 40, 340);
+
+    pdf.text(`Chassis No: ${chassis.value}`, 40, 370);
+    pdf.text(`Engine No: ${engine.value}`, 40, 400);
+    pdf.text(`Model No: ${model.value}`, 40, 430);
+
+    pdf.text(`Hypothecated To: ${hypo.value}`, 40, 470);
+    pdf.text(`Seat Capacity: ${seat.value}`, 40, 500);
+    pdf.text(`Stand Capacity: ${stand.value}`, 40, 530);
+
+    pdf.text(`RLW: ${rlw.value}`, 300, 500);
+    pdf.text(`Unladen Wt: ${unladen.value}`, 300, 530);
+    pdf.text(`Cubic Capacity: ${cubic.value}`, 300, 560);
+    pdf.text(`Wheel Base: ${wheel.value}`, 300, 590);
+
+    pdf.text(`Address: ${address.value}`, 40, 590);
+    pdf.text(`Issuing Authority: ${authority.value}`, 40, 620);
 
     // ---------- QR DATA (GOVERNMENT STYLE) ----------
     const qrString =
-        document.getElementById("regn").value + "|" +
-        document.getElementById("chassis").value + "|" +
-        document.getElementById("engine").value + "|" +
-        document.getElementById("fuel").value + "|" +
-        document.getElementById("owner").value + "|" +
-        document.getElementById("manufacturer").value;
+        regn.value + "|" +
+        chassis.value + "|" +
+        engine.value + "|" +
+        fuel.value + "|" +
+        owner.value + "|" +
+        manufacturer.value;
 
     const qrDataUrl = await generateQR(qrString);
-    pdf.addImage(qrDataUrl, "PNG", 40, 240, 270, 270);
+    pdf.addImage(qrDataUrl, "PNG", 700, 200, 250, 250);
 
-    pdf.save("RC-GOV.pdf");
+    pdf.save("RC-NoBackground.pdf");
 }
 
-// QR helper
+// QR generator
 function generateQR(text) {
     return new Promise((resolve) => {
         const temp = document.createElement("div");
@@ -141,7 +141,7 @@ function generateQR(text) {
         temp.style.left = "-9999px";
         document.body.appendChild(temp);
 
-        const q = new QRCode(temp, {
+        new QRCode(temp, {
             text: text,
             width: 300,
             height: 300,
@@ -153,16 +153,6 @@ function generateQR(text) {
             document.body.removeChild(temp);
             resolve(img);
         }, 400);
-    });
-}
-
-// Load background image
-function loadImage(url) {
-    return new Promise((resolve) => {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = () => resolve(img);
-        img.src = url;
     });
 }
 </script>
