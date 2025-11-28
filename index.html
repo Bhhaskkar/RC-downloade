@@ -277,6 +277,7 @@
       unladen: document.getElementById("unladenWt").value.trim(),
       issuingAuth: document.getElementById("issuingAuth").value.trim(),
       regdValidity: document.getElementById("regdValidity").value.trim(),
+      signatureFile: document.getElementById("signFile").files[0],
       purpose: document.getElementById("purpose").value.trim(),
       cubic: document.getElementById("cubic").value.trim(),
       noCyc: document.getElementById("noCyc").value.trim(),
@@ -301,6 +302,17 @@
     if (idx > -1) return [addr.slice(0,idx), addr.slice(idx+1)];
     return [addr,""];
   }
+
+  function loadImageAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null);
+
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = e => reject(e);
+    reader.readAsDataURL(file);
+  });
+}
 
   // Generate QR into hidden div and return DataURL
   function generateQrDataUrl(text) {
@@ -344,6 +356,14 @@
       format: [594.95996, 841.91998]
     });
 
+    // Load signature image first
+    const signDataUrl = await loadImageAsDataURL(d.signatureFile);
+
+    if (signDataUrl) {
+    // X, Y, Width, Height → adjust to match your card
+    pdf.addImage(signDataUrl, "PNG", 165, 130, 30, 12);
+}
+
     function drawBold(text, x, y, size) {
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(size);
@@ -363,17 +383,17 @@
     // === Text positions & sizes taken from HIMANSHU5 ===
 
     // Block 0: Regn No, Owner, S/W/D
-    drawNormal("Regd. Number", 10,  9.0);
-    drawNormal("Regd. Owner",  10, 15.0);
-    drawNormal("S/w/D of",     10, 21.75);
-    drawNormal("Purpose", 10, 27.75)
+    // drawNormal("Regd. Number", 10,  9.0);
+    // drawNormal("Regd. Owner",  10, 15.0);
+    // drawNormal("S/w/D of",     10, 21.75);
+    // drawNormal("Purpose", 10, 27.75)
     drawBold(d.regnNo,         47.9609,  9.0,  5.1750);
     drawBold(d.regdOwner,      47.9609, 15.0,  5.1750);
     drawBold(d.swdof,          47.9609, 21.75, 5.1750);
 
     // Block 1: Regn Date + Validity (split into two parts)
-    drawNormal("Regn. Date", 10, 33.75);
-    drawNormal("Manufcaturing Dt.", 82,33.75)
+    // drawNormal("Regn. Date", 10, 33.75);
+    // drawNormal("Manufcaturing Dt.", 82,33.75)
     drawBold(d.mfgDt, 120, 33.75,5.1750)
     drawBold(d.regnDate,   47.9609, 33.75, 5.1750);
     drawBold(val1,        138.9961, 33.75, 5.1750);
@@ -381,11 +401,11 @@
 
     // Block 2: Colour, Fuel, Vehicle Class, Body Type, Manufacturer
 
-    drawNormal("Colour", 10, 39.75);
-    drawNormal("Fuel", 10, 44.25);
-    drawNormal("Vechile Class", 10, 49.50);
-    drawNormal("Body Type", 10, 54.75);
-    drawNormal("Manufacturar", 10, 60.00);
+    // drawNormal("Colour", 10, 39.75);
+    // drawNormal("Fuel", 10, 44.25);
+    // drawNormal("Vechile Class", 10, 49.50);
+    // drawNormal("Body Type", 10, 54.75);
+    // drawNormal("Manufacturar", 10, 60.00);
     drawBold(d.colour,     47.9609, 39.75, 4.3500);
     drawBold(d.fuel,       47.9609, 44.25, 4.3500);
     drawBold(d.vehClass,   47.9609, 49.50, 4.3500);
@@ -393,48 +413,48 @@
     drawBold(d.manufact,   47.9609, 60.00, 4.3500);
 
     // Block 3: Chassis, Engine, Model
-    drawNormal("Chassis No.", 10, 66.00);
-    drawNormal("Engine No.", 10, 72.00);
-    drawNormal("Model No.", 10, 78.00);
+    // drawNormal("Chassis No.", 10, 66.00);
+    // drawNormal("Engine No.", 10, 72.00);
+    // drawNormal("Model No.", 10, 78.00);
     drawBold(d.chassisNo,  47.9609, 66.00, 5.1750);
     drawBold(d.engineNo,   47.9609, 72.00, 5.1750);
     drawBold(d.modelNo,    47.9609, 78.00, 5.1750);
 
     // Block 5: Hypothecated To, Owner Serial, Tax Paid
-    drawNormal("Hypothecated To", 82, 85.75);
-    drawNormal("No. Of Cyc", 125, 98.25)
-    drawNormal("Owner Serial", 125, 105.50);
-    drawNormal("Tax Paid Up To", 170, 26.75);
-    drawNormal("Regd. Validity", 170, 33.75)
+    // drawNormal("Hypothecated To", 82, 85.75);
+    // drawNormal("No. Of Cyc", 125, 98.25)
+    // drawNormal("Owner Serial", 125, 105.50);
+    // drawNormal("Tax Paid Up To", 170, 26.75);
+    // drawNormal("Regd. Validity", 170, 33.75)
     drawBold(d.hypoto,     116.4063, 85.75, 4.7250);
     drawBold(d.ownerSerial,155, 105.50, 5.1750);
-    drawBold(d.taxPaid,    200, 33.75, 5.1750);
+    drawBold(d.taxPaid,    205, 33.75, 5.1750);
 
     // Block 6: Seat, Stand, Unladen
-    drawNormal("Seat Capacity", 82, 97.25);
-    drawNormal("Stand Capacity", 82, 105.50);
-    drawNormal("Unladen Wt", 170, 87.75);
+    // drawNormal("Seat Capacity", 82, 97.25);
+    // drawNormal("Stand Capacity", 82, 105.50);
+    // drawNormal("Unladen Wt", 170, 87.75);
     drawBold(d.seatCapacity, 118.4063,97.25,5.1750);
     drawBold(d.standCapacity,118.4297,105.50,5.1750); 
     drawBold(d.unladen,      203,87.75,5.1750);
 
     // Block 7: Cubic, Wheel Base, RLW
-    drawNormal("Cubic Capacity", 170, 93.75);
-    drawNormal("Wheel Base", 170, 99.75);
-    drawNormal("R.L.W", 170, 105.75);
+    // drawNormal("Cubic Capacity", 170, 93.75);
+    // drawNormal("Wheel Base", 170, 99.75);
+    // drawNormal("R.L.W", 170, 105.75);
     drawBold(d.cubic,      203,93.75,5.1750);
     drawBold(d.wheelBase,  203,99.75,5.1750);
     drawBold(d.rlw,        203,105.75,5.1750);
 
     // Block 8: Address lines
-    drawNormal("Address", 82, 120.75);
+    // drawNormal("Address", 82, 120.75);
     drawBold(addr1,        107.0664,120.75,5.1750);
     drawBold(addr2,        107.0664,126.75,5.1750);
 
     // Block 9: Issuing authority (non-bold in original)
-    drawNormal("Issued, Authority", 90, 147);
-    drawNormal("Signature Of Issuing Authority", 150, 147.00);
-    drawNormal(d.issuingAuth, 97,147.00,5.6250);
+    // drawNormal("Issued, Authority", 90, 147);
+    // drawNormal("Signature Of Issuing Authority", 150, 147.00);
+    drawNormal(d.issuingAuth, 103,141,5.6250);
 
     // === QR code position: same as image block in HIMANSHU5 ===
     // Image block bbox: (5.25, 81.0, 84.0, 155.25) -> width=78.75, height=74.25
@@ -449,9 +469,9 @@
     try {
       const qrDataUrl = await generateQrDataUrl(qrText);
       if (qrDataUrl) {
-        const qrX = 5.25;
+        const qrX = 4.25;
         const qrY = 81.0;
-        const qrW = 78.75;
+        const qrW = 75.75;
         const qrH = 74.25;
         pdf.addImage(qrDataUrl, "PNG", qrX, qrY, qrW, qrH);
       }
